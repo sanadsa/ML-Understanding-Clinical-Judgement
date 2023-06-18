@@ -33,10 +33,6 @@
 - Python (version 3)
 - Git (optional, if you want to clone the project repository)
 
-### Usage
-
-- Upon running the script, follow the prompts and provide the necessary inputs to proceed with the decision-making process.
-
 ### License
 
 This project is licensed under the [MIT License](LICENSE).
