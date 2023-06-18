@@ -7,7 +7,7 @@
 1. Clone the project repository to your local machine using the following command:
 
    ```
-   git clone <repository-url>
+   git clone https://github.com/sanadsa/ML-Understanding-Clinical-Judgement.git
    ```
 
 2. Navigate to the project folder in the command line or terminal:
@@ -30,8 +30,8 @@
 
 ### Requirements
 
-- Python (version X.X.X)
-- Git (version X.X.X) (optional, if you want to clone the project repository)
+- Python (version 3)
+- Git (optional, if you want to clone the project repository)
 
 ### Usage
 
