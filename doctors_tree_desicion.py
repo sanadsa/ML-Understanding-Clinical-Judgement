@@ -65,6 +65,9 @@ def get_decision_trees(X, y):
 def two_tree_distance(tree1, tree2):
     set1 = set(tree1.tree_.feature)
     set2 = set(tree2.tree_.feature)
+
+    print("set1: tree features")
+    print(set1)
     intersection = set1.intersection(set2)
     union = set1.union(set2)
     jaccard_similarity = len(intersection) / len(union)
