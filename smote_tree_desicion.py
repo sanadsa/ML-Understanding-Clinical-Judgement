@@ -7,7 +7,7 @@ import numpy as np
 
 def load_the_data():
     # Load the datasets
-    data = pd.read_csv('assets/MEELMMPI_Characteristics.csv')
+    data = pd.read_csv('assets/MEELMMPI.csv')
     judges = pd.read_csv('assets/MEELJUD.csv')
     
     judges=judges.drop(judges.columns[-1],axis=1)
