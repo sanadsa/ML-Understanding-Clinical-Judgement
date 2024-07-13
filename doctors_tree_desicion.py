@@ -8,8 +8,8 @@ from IPython.display import display
 
 def load_the_data():
     from sklearn.preprocessing import MinMaxScaler
-    judeges = pd.read_csv('MEELJUD.csv')
-    data = pd.read_csv('MEELMMPI.csv')
+    judeges = pd.read_csv('assets/MEELJUD.csv')
+    data = pd.read_csv('assets/MEELMMPI.csv')
 
     judeges=judeges.drop(judeges.columns[-1],axis=1)
     data=data.drop(data.columns[-1],axis=1)
@@ -18,12 +18,12 @@ def load_the_data():
     judges_list = [judeges.iloc[:, i].tolist() for i in range(len(judeges.columns))]
     return data, judges_list, judeges.columns
 
-def split_data(data, judges_list):
-    from sklearn.model_selection import train_test_split
+# def split_data(data, judges_list):
+#     from sklearn.model_selection import train_test_split
 
-    # Split the data and labels into training and test sets
-    X_train, X_test, y_train, y_test = train_test_split(data, judges_list[1], test_size=0.2, random_state=42)
-    return X_train, X_test, y_train, y_test
+#     # Split the data and labels into training and test sets
+#     X_train, X_test, y_train, y_test = train_test_split(data, judges_list[1], test_size=0.2, random_state=42)
+#     return X_train, X_test, y_train, y_test
 
 def get_decision_trees(X, y):
     from sklearn.tree import DecisionTreeClassifier
@@ -40,6 +40,7 @@ def get_decision_trees(X, y):
         X_train, X_test, y_train, y_test = train_test_split(X, judge, test_size=0.2, random_state=42)
 
         clf.fit(X_train, y_train)
+        print(tree.plot_tree(clf))
         y_pred = clf.predict(X_test)
 
         cm = confusion_matrix(y_test, y_pred)
@@ -112,50 +113,50 @@ def tree_distance_heatmap(decision_trees):
     plt.show()
     return matrix
 
-def tree_to_bag_of_conditions(tree):
-    return [x.split('\n')[0] for x in tree.strip().split("--- ")[1:] if "class" not in x]
+# def tree_to_bag_of_conditions(tree):
+#     return [x.split('\n')[0] for x in tree.strip().split("--- ")[1:] if "class" not in x]
 
-def similarity(tree1, tree2):
-    bag1 = tree_to_bag_of_conditions(tree1)
-    bag2 = tree_to_bag_of_conditions(tree2)
-    matchings = 0
-    for condition in bag1:  
-        if condition in bag2:
-            if two_conditions_match(bag1, bag2):
-                matchings += 1
-                break
-    return matchings
+# def similarity(tree1, tree2):
+#     bag1 = tree_to_bag_of_conditions(tree1)
+#     bag2 = tree_to_bag_of_conditions(tree2)
+#     matchings = 0
+#     for condition in bag1:  
+#         if condition in bag2:
+#             if two_conditions_match(bag1, bag2):
+#                 matchings += 1
+#                 break
+#     return matchings
 
-def two_conditions_match(tree1, tree2, threshold):
-    if tree1["feature"] != tree2["feature"]:
-        return None
+# def two_conditions_match(tree1, tree2, threshold):
+#     if tree1["feature"] != tree2["feature"]:
+#         return None
     
-    if tree1["sign"] != tree2["sign"]:
-        return None
+#     if tree1["sign"] != tree2["sign"]:
+#         return None
     
-    if tree1["value"] < tree2["value"]:
-        normalized_value = (tree1["value"] - tree1["min_value"]) / (tree1["max_value"] - tree1["min_value"])
-    else:
-        normalized_value = (tree2["value"] - tree2["min_value"]) / (tree2["max_value"] - tree2["min_value"])
+#     if tree1["value"] < tree2["value"]:
+#         normalized_value = (tree1["value"] - tree1["min_value"]) / (tree1["max_value"] - tree1["min_value"])
+#     else:
+#         normalized_value = (tree2["value"] - tree2["min_value"]) / (tree2["max_value"] - tree2["min_value"])
     
-    if normalized_value < threshold:
-        return 1
-    else:
-        return 0
+#     if normalized_value < threshold:
+#         return 1
+#     else:
+#         return 0
 
-def plot_disagreement_matrix(confusion_matrices):
-    import numpy as np
-    from sklearn.metrics import confusion_matrix
+# def plot_disagreement_matrix(confusion_matrices):
+#     import numpy as np
+#     from sklearn.metrics import confusion_matrix
 
-    num_doctors = 29
-    disagreement_matrix = np.zeros((num_doctors, num_doctors))
+#     num_doctors = 29
+#     disagreement_matrix = np.zeros((num_doctors, num_doctors))
 
-    for i in range(num_doctors):
-        for j in range(num_doctors):
-            disagreement_matrix[i, j] = np.sum(confusion_matrices[i] != confusion_matrices[j])
+#     for i in range(num_doctors):
+#         for j in range(num_doctors):
+#             disagreement_matrix[i, j] = np.sum(confusion_matrices[i] != confusion_matrices[j])
 
-    print("Disagreement Matrix:")
-    print(disagreement_matrix)
+#     print("Disagreement Matrix:")
+#     print(disagreement_matrix)
 
 def judges_heatmap(judges_list, judges_names):
     import matplotlib.pyplot as plt

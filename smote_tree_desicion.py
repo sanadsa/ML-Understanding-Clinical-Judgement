@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import mean_squared_error
 import numpy as np
+from sklearn import tree
 
 def load_the_data():
     # Load the datasets
@@ -14,6 +15,30 @@ def load_the_data():
     data=data.drop(data.columns[-1],axis=1)
     
     return data, judges
+
+def predictions_with_smote_decision_tree(X, df_jud):
+    all_predictions = []
+    
+    for judge_index in range(df_jud.shape[1]):
+        y = df_jud.iloc[:, judge_index]
+        X_res, y_res, df_resampled = smote_augmentation(X, y)
+        print(f"Number of samples after SMOTE for Judge {judge_index + 1}: {len(y_res)}")
+        y_test, y_pred = decision_tree_on_judge(X_res, y_res)
+        all_predictions.append(y_pred)
+    
+    return all_predictions
+
+def predictions_with_smote_linear_regression(X, df_jud):
+    all_predictions = []
+    
+    for judge_index in range(df_jud.shape[1]):
+        y = df_jud.iloc[:, judge_index]
+        X_res, y_res, df_resampled = smote_augmentation(X, y)
+        print(f"Number of samples after SMOTE for Judge {judge_index + 1}: {len(y_res)}")
+        y_test, y_pred = linear_regression_on_judge(X_res, y_res)
+        all_predictions.append(y_pred)
+    
+    return all_predictions
 
 def smote_augmentation(df_characteristics, judge):
     # Features (X) from MEELMMPI dataset
@@ -32,6 +57,7 @@ def smote_augmentation(df_characteristics, judge):
     
     return X_res, y_res, df_resampled
 
+# desicion tree on judge
 def decision_tree_on_judge(X, judge):
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.model_selection import train_test_split
@@ -40,23 +66,25 @@ def decision_tree_on_judge(X, judge):
     X_train, X_test, y_train, y_test = train_test_split(X, judge, test_size=0.2, random_state=42)
 
     decision_tree_classifier.fit(X_train, y_train)
+    print(tree.plot_tree(decision_tree_classifier))
     y_pred = decision_tree_classifier.predict(X_test)
     
     return y_test, y_pred
 
-def predictions_with_smote(X, df_jud):
-    all_predictions = []
+# linear regression on judge
+def linear_regression_on_judge(X, judge):
+    from sklearn.linear_model import LinearRegression
+    from sklearn.model_selection import train_test_split
     
-    for judge_index in range(df_jud.shape[1]):
-        y = df_jud.iloc[:, judge_index]
-        X_res, y_res, df_resampled = smote_augmentation(X, y)
-        print(f"Number of samples after SMOTE for Judge {judge_index + 1}: {len(y_res)}")
-        y_test, y_pred = decision_tree_on_judge(X_res, y_res)
-        all_predictions.append(y_pred)
-    
-    return all_predictions
+    linear_regression = LinearRegression()
+    X_train, X_test, y_train, y_test = train_test_split(X, judge, test_size=0.2, random_state=42)
 
-def mse_predictions(all_predictions):
+    linear_regression.fit(X_train, y_train)
+    y_pred = linear_regression.predict(X_test)
+    
+    return y_test, y_pred
+
+def mse_predictions(all_predictions, model_name='Decision Tree'):
     # Initialize MSE matrix
     num_judges = len(all_predictions)
     mse_matrix = np.zeros((num_judges, num_judges))
@@ -69,7 +97,7 @@ def mse_predictions(all_predictions):
     # Create a heatmap
     plt.figure(figsize=(12, 10))
     sns.heatmap(mse_matrix, annot=True, fmt=".2f", cmap='viridis', xticklabels=[f'Judge {i+1}' for i in range(num_judges)], yticklabels=[f'Judge {i+1}' for i in range(num_judges)])
-    plt.title('Pairwise MSE Heatmap for Predictions of Each Judge')
+    plt.title(f'Pairwise MSE heatmap for {model_name} predictions of each judge')
     plt.xlabel('Judge Index')
     plt.ylabel('Judge Index')
     plt.show()
@@ -80,13 +108,20 @@ def main():
     df_characteristics, df_jud = load_the_data()
         
     # loop over the judges and run decision trees and return predictions
-    all_predictions = predictions_with_smote(df_characteristics, df_jud)
+    all_predictions_trees = predictions_with_smote_decision_tree(df_characteristics, df_jud)
+    all_predictions_linear_regression = predictions_with_smote_linear_regression(df_characteristics, df_jud)
 
-    # Print the predictions for all judges
-    for i, preds in enumerate(all_predictions):
-        print(f"Predictions for Judge {i + 1}: {preds}")
+    # Print the decision trees predictions for all judges
+    for i, preds in enumerate(all_predictions_trees):
+        print(f"Decision tree predictions for Judge {i + 1}: {preds}")
 
-    mse_predictions(all_predictions)
+    mse_predictions(all_predictions_trees, model_name='Decision Tree')
+    
+    # Print the linear regression predictions for all judges
+    for i, preds in enumerate(all_predictions_linear_regression):
+        print(f"Linear regression predictions for Judge {i + 1}: {preds}")
+        
+    mse_predictions(all_predictions_linear_regression, model_name='Linear Regression')
     
     
 main()
