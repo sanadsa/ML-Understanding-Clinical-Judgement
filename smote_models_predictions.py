@@ -107,7 +107,7 @@ def main():
     # Load the data
     df_characteristics, df_jud = load_the_data()
         
-    # loop over the judges and run decision trees and return predictions
+    # loop over the judges and run decision trees and linear regression and return predictions
     all_predictions_trees = predictions_with_smote_decision_tree(df_characteristics, df_jud)
     all_predictions_linear_regression = predictions_with_smote_linear_regression(df_characteristics, df_jud)
 
