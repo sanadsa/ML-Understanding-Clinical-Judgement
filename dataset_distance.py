@@ -23,9 +23,8 @@ plt.show()
 # Numerical Values:
 # Each cell (i,j) in the matrix represents the Euclidean distance between the evaluations of Judge 
 # i and Judge j.
-# For example, the distance between Judge J1 and Judge 
-# J2 is 51. This means the evaluations given by Judge J1 and Judge 
-# J2 are 51 units apart in the Euclidean space formed by the patients' scores.
+# For example, the distance between Judge J1 and Judge # J2 is 51.
+# This means the evaluations given by Judge J1 and Judge J2 are 51 units apart in the Euclidean space formed by the patients' scores.
 
 # Interpretation:
 # Smaller values indicate that two judges have similar evaluations of the patients. For instance, the distance between Judge 

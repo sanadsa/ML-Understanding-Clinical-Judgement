@@ -63,6 +63,31 @@ def get_decision_trees(X, y):
     
     return decision_trees, confusion_matrics
 
+
+def get_linear_regression(X, y):
+    from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import confusion_matrix
+
+    linear_regression = []
+    confusion_matrics = []
+
+    for i, judge in enumerate(y):
+        clf = LinearRegression()
+        X_train, X_test, y_train, y_test = train_test_split(X, judge, test_size=0.2, random_state=42)
+
+        clf.fit(X_train, y_train)
+        # print linear regression coefficients
+        print(clf.coef_)
+        y_pred = clf.predict(X_test)
+
+        # cm = confusion_matrix(y_test, y_pred)
+
+        # confusion_matrics.append(cm)
+
+        # linear_regression.append(clf)
+        
+    return linear_regression, confusion_matrics
+
 def two_tree_distance(tree1, tree2):
     set1 = set(tree1.tree_.feature)
     set2 = set(tree2.tree_.feature)
@@ -112,6 +137,43 @@ def tree_distance_heatmap(decision_trees):
 
     plt.show()
     return matrix
+
+def linear_regression_distance_heatmap(linear_regression):
+    n = len(linear_regression)
+    matrix = np.zeros((n, n))
+    for i in range(n):
+        for j in range(n):
+            matrix[i][j] = two_tree_distance(linear_regression[i], linear_regression[j])
+    
+    display(pd.DataFrame(matrix))
+
+    # Create a heatmap using matplotlib
+    fig, ax = plt.subplots(figsize=(10, 8))
+    im = ax.imshow(matrix, cmap='coolwarm')
+
+    # Add colorbar
+    cbar = ax.figure.colorbar(im, ax=ax)
+    cbar.ax.set_ylabel('Distance', rotation=-90, va="bottom")
+
+    # Set tick labels and axis labels
+    ax.set_xticks(np.arange(n))
+    ax.set_yticks(np.arange(n))
+    ax.set_xticklabels(np.arange(n), fontsize=8)
+    ax.set_yticklabels(np.arange(n), fontsize=8)
+    ax.set_xlabel('Tree Index', fontsize=10)
+    ax.set_ylabel('Tree Index', fontsize=10)
+
+    # Rotate the tick labels and set their alignment
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
+
+    # Loop over data dimensions and create text annotations
+    for i in range(n):
+        for j in range(n):
+            text = ax.text(j, i, f'{matrix[i, j]:.2f}',
+                           ha="center", va="center", color="w", fontsize=8)
+
+    plt.show()
 
 # def tree_to_bag_of_conditions(tree):
 #     return [x.split('\n')[0] for x in tree.strip().split("--- ")[1:] if "class" not in x]
@@ -210,10 +272,17 @@ def judges_heatmap(judges_list, judges_names):
     df = pd.DataFrame(judges_matrix)
     display(df)
 
-def main():
+def main_desicion_trees():
     data, judges_list, judges_names = load_the_data()
     judges_heatmap(judges_list, judges_names)
     decision_trees, confusion_matrics = get_decision_trees(data, judges_list)
     tree_distance_heatmap(decision_trees)
 
-main()
+main_desicion_trees()
+
+def main_linear_regression():
+    data, judges_list, judges_names = load_the_data()
+    linear_regression, confusion_matrics = get_linear_regression(data, judges_list)
+    linear_regression_distance_heatmap(linear_regression)
+
+main_linear_regression()
